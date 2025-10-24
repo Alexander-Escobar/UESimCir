@@ -15,6 +15,7 @@ Permite **diagramar y simular circuitos digitales**, **generar tablas de verdad*
 **UESimCir — UES Simulador de Circuitos Digitales** 
 This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.  
 Esta obra está licenciada bajo **Creative Commons Atribución - No Comercial - Compartir Igual 4.0 Internacional (CC BY-NC-SA 4.0)**.
+
 © 2025 Alexander Enrique Escobar O.
 <p align="center">
   <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
