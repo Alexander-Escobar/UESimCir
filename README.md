@@ -2,6 +2,7 @@
 Herramienta didáctica diseñada para la asignatura Sistemas Digitales de la Universidad de El Salvador, Permite diagramar y Simular Circuitos Digitales, generar tablas de verdad, trabajar con ecuaciones booleanas todo lo anterior implementado en HTML5 y JavaScript
 
 
+
 ## License / Licencia
 **UESimCir — UES Simulador de Circuitos Digitales** 
 This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.  
@@ -12,5 +13,5 @@ Esta obra está licenciada bajo **Creative Commons Atribución - No Comercial - 
     <img alt="Licencia CC BY-NC-SA 4.0" src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" />
   </a>
 </p>
-See the full license in the [LICENSE](LICENSE) file. / Consulte la licencia completa en el archivo [LICENSE](LICENSE).
+
 
