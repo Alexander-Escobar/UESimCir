@@ -1,5 +1,13 @@
 # UESimCir
-Herramienta didáctica diseñada para la asignatura Sistemas Digitales de la Universidad de El Salvador, Permite diagramar y Simular Circuitos Digitales, generar tablas de verdad, trabajar con ecuaciones booleanas todo lo anterior implementado en HTML5 y JavaScript
+### 📘 Description / Descripción
+
+**English:**  
+Educational tool designed for the “Digital Systems” course at the University of El Salvador.  
+It allows users to design and simulate digital circuits, generate truth tables, and work with Boolean equations — all implemented entirely in HTML5 and JavaScript.
+
+**Español:**  
+Herramienta didáctica diseñada para la asignatura **Sistemas Digitales** de la **Universidad de El Salvador**.  
+Permite **diagramar y simular circuitos digitales**, **generar tablas de verdad** y **trabajar con ecuaciones booleanas**, todo implementado en **HTML5 y JavaScript**.
 
 
 
