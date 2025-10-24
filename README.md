@@ -12,4 +12,5 @@ Esta obra está licenciada bajo **Creative Commons Atribución - No Comercial - 
     <img alt="Licencia CC BY-NC-SA 4.0" src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" />
   </a>
 </p>
-See the full license in [`LICENSE`](./LICENSE). / Consulte la licencia completa en [`LICENSE`](./LICENSE).
+See the full license in the [LICENSE](LICENSE) file. / Consulte la licencia completa en el archivo [LICENSE](LICENSE).
+
