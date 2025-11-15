@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<!-- Required meta tags -->
+    <meta charset="UTF-8">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    <title>UESimCir Editor de Ecuacion Bool</title>
+	<meta property="og:title" content="UESimCir - UES Simulador de Circuitos" />
+	<meta name="keywords" content="Simulador, Simulator, Digital, Circuitos, Circuits, UNS">
+	<meta name="author" content="Alexander Enrique Escobar">
+	<meta name="description" content="Un simulador de circuitos digitales en HTML, CSS y JS off-line gratuito, open-source">
+	
+	<!-- ##################### VENDOR STYLES ##################### -->
+	<!-- Bootstrap 4.3.1 -->
+	<link rel="stylesheet" type="text/css" href="vendor/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/icons.css">
+	
+	<!-- SimCirJS -->
+	<link rel="stylesheet" type="text/css" href="vendor/css/simcir.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/simcir-basicset.css">
+	
+	<!-- Generador de Imagen, NO disponible en esta version -->
+	<!-- <script src="simcirimage.js"></script>  -->
+
+    <style>
+        /* Estilos personalizados para ajustar los colores de los botones al diseño de la imagen */
+        .btn-tabla {
+            background-color: #555; /* Gris oscuro para el botón TABLA */
+            border-color: #555;
+        }
+        .btn-diagrama {
+            background-color: #333; /* Gris más oscuro para el botón DIAGRAMA */
+            border-color: #333;
+        }
+        /* Para centrar el texto de las celdas de la tabla */
+        .table-centered td, .table-centered th {
+            text-align: center;
+        }
+        /* Estilo para los títulos de resultados (Simplificada, SOP, POS) */
+        .results-section h3 {
+            font-size: 1.15rem;
+            font-weight: bold;
+        }
+        .results-section p {
+            color: #555;
+        }
+		
+		#mySimcirS, #mySimcirO  
+		{
+			width: 90vw;
+			overflow: auto;
+		}
+		
+		body { background: #fafafa; padding: 20px;}
+    </style>
+</head>
+<body>
+	<!-- ##################### NAVBAR ##################### -->
+	<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" ng-cloak ng-if="userLogged">
+	  <a class="navbar-brand" style="cursor: pointer;"><img width="50" src="custom/img/logo_blur.png"></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	
+	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item"><a class="nav-link" title="Tabla de Verdad"  style="cursor:pointer;" href="./tablaverdad.html" data-target="#container" ><i class="material-icons">toc</i></a></li>
+			<li class="nav-item"><a class="nav-link" title="Simular Circuito"  style="cursor:pointer;" href="./index.html" data-target="#container" ><i class="material-icons">memory</i></a></li>
+			<li class="nav-item"><a class="nav-link" title="Ayuda Rapida" data-toggle="modal" data-target="#help-modal" style="cursor:pointer;"><i class="material-icons">help</i></a></li>
+		</ul>		
+	  </div>
+	</nav>
+	
+    <div class="container my-5">
+        <h1 class="mb-4">Ingrese la Ecuación Bool</h1>
+
+        <div class="row mb-4 align-items-start">
+            
+            <div class="col-12 col-lg-8">
+                <div class="form-group mb-0">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <input type="text" id="form-ecuacion-var" class="form-control text-center" style="width: 40px;" aria-label="Variable de Salida" placeholder="Z" value="Z" >
+                        </div>
+                        <input type="text" id="form-ecuacion" class="form-control" aria-label="Ecuación Booleana" 
+							value="(A + B') * (A' + B) * (A' + B') + C" 
+							placeholder="(A + B') * (A' + B) * (A' + B') + C" >
+                    </div>
+                    <small id="form-ecuacion-danger" class="form-text text-danger mt-1">Mensaje de Error</small>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4 d-flex justify-content-start mt-3 mt-lg-0">
+                <input type="button" id="tabla" value="TABLA" class="btn btn-tabla mr-2 text-white font-weight-bold" onclick="fx_tabla()"  >
+				<input type="button" id="diagrama" value="DIAGRAMA" class="btn btn-tabla mr-2 text-white font-weight-bold" 
+					onclick="setvalues(); setdraw('ec-simple', '#mySimcirS'); setdraw('var-original', '#mySimcirO'); " 
+					disabled> <!-- La Ecuacion Original, Diagrama de Ecuacion Simplificada, Diagrama de Ecuacion Original -->
+				<input type="button" id="tabla" value="LIMPIAR" class="btn btn-tabla mr-2 text-white font-weight-bold" onclick="fx_limpiar()"  >
+            </div>
+
+        </div>
+
+        <div class="mb-4">
+            <p id="var-entrada" class="mb-0">Variables de Entrada: No Definido</p>
+            <p id="var-salida" class="mb-0">Variables de Salida: 1</p>
+			<p id="var-original" class="mb-0" hidden>Variables de Salida: 1</p>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row results-section mb-5">
+            <div class="col-4">
+                <div class="result-item">
+                    <h3 class="text-uppercase">Simplificada</h3>
+                    <p id="ec-simple">Ecuación Simplificada</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="result-item">
+                    <h3 class="text-uppercase">SOP</h3>
+                    <p id="ec-sop">Suma de Productos</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="result-item">
+                    <h3 class="text-uppercase">POS</h3>
+                    <p id="ec-pos">Productos de Suma</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="table-responsive" class="table-responsive-sm">
+            <table class="table table-borderless table-centered">
+                <thead>
+                    <tr>
+                        <th scope="col" class="pb-2 border-bottom">m</th>
+                        <th scope="col" class="pb-2 border-bottom">A</th>
+                        <th scope="col" class="pb-2 border-bottom">B</th>
+                        <th scope="col" class="pb-2 border-bottom">C</th>
+                        <th scope="col" class="pb-2 border-bottom">D</th>
+                        <th scope="col" class="pb-2 border-bottom">Z</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>X</td>
+                    </tr>
+                    </tbody>
+            </table>
+        </div>
+		
+		<hr class="my-4">
+		<!-- Área de renderizado del circuito -->
+		<!-- Circuito de Ecuacion Original -->
+		<p id="mySimcirO-label"></p>
+		<div id="mySimcirO"></div>
+		<!-- Circuito de Ecuacion Simplificada -->
+		<p id="mySimcirS-label"></p>
+		<div id="mySimcirS"></div>
+	</div>
+	
+	
+	<!-- ##################### MODALS ##################### -->
+	<div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4>Ayuda</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+			        <p>
+					Para trabajar con Expresiones de Bool, desde el <em>Editor de Ecuaciones</em> debe tener las siguientes recomendaciones:
+					</p>
+					<ul>
+					<li><em>Variable de Salida</em>, va en la primera casilla</li>
+					<li><em>Variable de Entrada</em>, son detectadas en la ecuación y estas deben ser LETRAS exclusivamente, se recomienda el uso de Mayusculas</li>
+					<li><em>Caracteres Validos</em></li>
+						<ul>
+							<li>son Letras excluyendo la [Ñ] para definir <em>variables de Entrada</em></li>
+							<li>signo mas [+], para compuertas OR</li>
+							<li>signo asterisco [*], para compuertas AND, esta puede ser omitida entre parentesis o entre Variables de Entrada (Ej: ABC, (AB)(AC))</li>
+							<li>apostrofe para denegar ['] y debe ir al final de la variable (Ej: B')</li>
+							<li>los parentesis [ ( ) ] para indicar anidamiento, procure no ingresar mas de 3 niveles</li>
+						</ul>
+					</ul>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-dark" data-dismiss="modal">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+
+<!-- Fin Body -->
+</body>
+
+
+
+	<!-- ##################### VENDOR ASSETS ##################### -->
+	<!-- Bootstrap JS -->
+	<!-- JQuery 3.3.1 popper 1.14.7 Bootstrap 4.3.1 -->
+	<script type="text/javascript" src="vendor/js/jquery.min.js"></script>
+	<script type="text/javascript" src="vendor/js/popper.min.js"></script>
+	<script type="text/javascript" src="vendor/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="vendor/js/toastr.min.js"></script>
+	<script type="text/javascript" src="vendor/js/simplecrypto.min.js"></script>
+	<!-- <script type="text/javascript" src="vendor/js/tone.min.js"></script>	-->
+	<script type="text/javascript" src="vendor/js/simcir.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-basicset.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-library.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-transmitter.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-dso.js"></script>
+	
+	<!-- ##################### CUSTOM ASSETS ##################### -->
+	<!--
+	<script type="text/javascript" src="custom/js/instruments.js"></script>
+	<script type="text/javascript" src="custom/js/instruments2.js"></script>
+	<script type="text/javascript" src="custom/js/simcir-external-port.js"></script>
+	<script type="text/javascript" src="custom/js/simcir-audio-port.js"></script> -->
+	<script type="text/javascript" src="custom/js/simcir_parser.js"></script>
+	<!-- ## Propios de UESimCir ## -->
+
+<script type="text/javascript" >
+if (window.sessionStorage) {}
+else
+{
+	document.getElementById("label_warning").innerHTML="Tu Browser no soporta sessionStorage";
+	throw new Error('Tu Browser no soporta sessionStorage!');
+}
+
+
+function convertToBinary (number, bin) 
+{
+    if (number > 0) 
+	{
+        return convertToBinary( parseInt(number / 2) ) + (number % 2)
+    };
+    return '';
+}
+
+function setvalues()
+{
+	const input = document.getElementById("var-original");
+	input.innerHTML = document.getElementById("form-ecuacion-var").value + " = " + document.getElementById("form-ecuacion").value;
+}
+
+function fx_limpiar() 
+{
+	const input1 = document.getElementById("form-ecuacion");
+	const input2 = document.getElementById("ec-simple");
+	const input3 = document.getElementById("ec-sop");
+	const input4 = document.getElementById("ec-pos");
+	const input5 = document.getElementById("var-entrada");
+	const control1 = document.getElementById("mySimcirO-label");
+	const control2 = document.getElementById("mySimcirO");
+	const control3 = document.getElementById("mySimcirS-label");
+	const control4 = document.getElementById("mySimcirS");
+	const contenedorTabla = document.getElementById('table-responsive');
+	
+	input1.value = "";
+	input1.placeholder = "";
+	input2.innerHTML = "Ecuación Simplificada";
+	input3.innerHTML = "Suma de Productos";
+	input4.innerHTML = "Productos de Suma";
+	input5.innerHTML = "Variables de Entrada: No Definido";
+	control1.innerHTML = "";
+	control2.innerHTML = "";
+	control3.innerHTML = "";
+	control4.innerHTML = "";
+	
+    contenedorTabla.innerHTML = '<table class="table table-borderless table-centered">'+
+                '<thead>'+
+                '    <tr>'+
+                '        <th scope="col" class="pb-2 border-bottom">m</th>'+
+                '        <th scope="col" class="pb-2 border-bottom">A</th>'+
+                '        <th scope="col" class="pb-2 border-bottom">B</th>'+
+                '        <th scope="col" class="pb-2 border-bottom">C</th>'+
+                '        <th scope="col" class="pb-2 border-bottom">D</th>'+
+                '        <th scope="col" class="pb-2 border-bottom">Z</th>'+
+                '    </tr>'+
+                '</thead>'+
+                '<tbody>'+
+                '    <tr>'+
+                '        <td>0</td>'+
+                '        <td>0</td>'+
+                '        <td>0</td>'+
+                '        <td>0</td>'+
+                '        <td>0</td>'+
+                '        <td>X</td>'+
+                '    </tr>'+
+                '    </tbody>'+
+            '</table>'; // Limpiamos el contenido anterior.
+}
+</script>
+	
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<title>UESimCir</title>
+	
+	<meta property="og:title" content="UESimCir - UES Simulador de Circuitos" />
+	
+	<meta name="keywords" content="Simulador, Simulator, Digital, Circuitos, Circuits, UNS">
+	<meta name="author" content="Alexander Enrique Escobar">
+	<meta name="description" content="Un simulador de circuitos digitales en HTML, CSS y JS off-line gratuito, open-source">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+
+  	<!-- <link rel="icon" href="custom/img/favicon.ico"> -->
+	
+	<!-- ##################### VENDOR STYLES ##################### -->
+	<link rel="stylesheet" type="text/css" href="vendor/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/icons.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/simcir.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/simcir-basicset.css">
+
+</head>
+
+<body>
+	<!-- ##################### NAVBAR ##################### -->
+	<nav class="navbar navbar-expand-lg  fixed-top" ng-cloak ng-if="userLogged">
+	  <a class="navbar-brand" style="cursor: pointer;"><img width="50" src="custom/img/logo_blur.png"></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	
+	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item"><a class="nav-link" title="Obtener funciones" onclick="analyze()" style="cursor:pointer;"><i class="material-icons">functions</i></a></li>
+			<li class="nav-item"><a class="nav-link" title="Tabla de Verdad"  style="cursor:pointer;" href="./tablaverdad.html" data-target="#container" ><i class="material-icons">toc</i></a></li>
+			<li class="nav-item"><a class="nav-link" title="Ecuación Bool"  style="cursor:pointer;" href="./crearecuacion.html" data-target="#container" ><i class="material-icons">border_color</i></a></li>
+			<!-- <li class="nav-item"><a class="nav-link" title="Simular Circuito"  style="cursor:pointer;" href="./index.html" data-target="#container" ><i class="material-icons">memory</i></a></li>-->
+			
+			<!-- <a >link text data-toggle="modal" data-target="#about-modal"</a> -->
+			<li class="nav-item">
+				<div class="dropdown">
+					<a class="nav-link dropdown-toggle" id="dropdownMenuButton" title="Exportar"
+					style="cursor: pointer;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="material-icons">save_alt</i>
+					</a>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					  <!-- <a class="dropdown-item" style="cursor: pointer;" onclick="simexport('url')">Generar url para compartir</a> -->
+					  <a class="dropdown-item" style="cursor: pointer;" onclick="simexport('txt')">Exportar a archivo</a>
+					  <a class="dropdown-item" style="cursor: pointer;" onclick="simimport()">Importar desde archivo</a>
+					</div>
+				</div>
+			</li>
+			<li class="nav-item"><a class="nav-link" title="Ayuda Rapida" data-toggle="modal" data-target="#help-modal" style="cursor:pointer;"><i class="material-icons">help</i></a></li>
+		</ul>		
+	  </div>
+	</nav>
+
+	<!-- ##################### CONTENEDOR GRAFICO ##################### -->
+	<div class="container" style="margin-top: 60px; margin-left: 10px; margin-right: 10px; margin-bottom:10px;">
+		<div class="card hoverable z-depth-1" id="simcir" style="width: 100%; height: 80vh;"></div>
+	</div>
+	
+  
+	<!-- ##################### MODALS ##################### -->
+
+	<div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4>Ayuda</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+			        <p>Instrucciones de uso:</p>
+
+			        <ul>
+			            <li>Elija un dispositivo de la lista (Barra Vertical) y arrastre hacia la derecha.</li>
+			            <li>Conecte entradas con salidas arrastrando. Circulo Naranja/Amarillo con Circulo Blanco.</li>
+			            <li>Para desconectar un nodo, haga click en la entrada del dispositivo. Circulo Naranja/Amarillo.</li>
+			            <li>Para borrar un componente, arrastre hacia la barra de herramientas.</li>
+			            <!-- <li>Ctrl+Click (command+Click en Mac) para alternar la vista de circuito o código.</li> -->
+			            <li>Doble click en una etiqueta para renombrar los dispositivos.</li>
+			            <li>Doble click en un componente de mediana escala para abrir el circuito y visualizar lo que contiene.</li>
+			            <li>Use los componentes "Test-In" y "Test-Out" para obtener la tabla de verdad y Expresiones de Bool del circuito combinacional.</li>
+			        </ul>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-dark" data-dismiss="modal">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="results-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4>Análisis combinacional</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12 col-md-6">
+							<h5>Tabla de verdad</h5>
+							<table class="highlight" style="max-width:100%;overflow-x:auto;display:inline-block;">
+								<thead>
+									<tr id="truthTableHeader" style="text-align: center;">
+										<th>m</th>
+									</tr>
+								</thead>
+								<tbody id="truthTableBody" style="text-align: center;">
+								</tbody>
+							</table>
+						</div>
+						<div class="col-sm-12 col-md-6">
+							<h5>Detalles</h5>
+							<p id="resultDetails"></p>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-dark" data-dismiss="modal">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="share-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4>Compartir simulación</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" style="word-break: break-all;">
+
+					<p>Puede compartir la simulación actual mediante el siguiente enlace:</p>
+
+					<a id="shareUrl"></a>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-dark" data-dismiss="modal">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- ##################### VENDOR ASSETS ##################### -->
+	<script type="text/javascript" src="vendor/js/jquery.min.js"></script>
+	<script type="text/javascript" src="vendor/js/popper.min.js"></script>
+	<script type="text/javascript" src="vendor/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="vendor/js/toastr.min.js"></script>
+	<script type="text/javascript" src="vendor/js/simplecrypto.min.js"></script>
+	<script type="text/javascript" src="vendor/js/tone.min.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-basicset.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-library.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-transmitter.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-dso.js"></script>
+	
+	<!-- ##################### CUSTOM ASSETS ##################### -->
+	<script type="text/javascript" src="custom/js/instruments.js"></script>
+	<script type="text/javascript" src="custom/js/instruments2.js"></script>
+	<script type="text/javascript" src="custom/js/simcir-external-port.js"></script>
+	<script type="text/javascript" src="custom/js/simcir-audio-port.js"></script>
+	<script type="text/javascript" src="custom/js/controller.js"></script>
+</body>
+
+</html>

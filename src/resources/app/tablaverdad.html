@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+	<title>UESimCir</title>
+	<meta property="og:title" content="UESimCir - UES Simulador de Circuitos" />
+	<meta name="keywords" content="Simulador, Simulator, Digital, Circuitos, Circuits, UNS">
+	<meta name="author" content="Alexander Enrique Escobar">
+	<meta name="description" content="Un simulador de circuitos digitales en HTML, CSS y JS off-line gratuito, open-source">
+	
+	
+
+	<!-- ##################### VENDOR STYLES ##################### -->
+	<!-- Bootstrap 4.3.1 -->
+	<link rel="stylesheet" type="text/css" href="vendor/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/icons.css">
+	
+	<!-- SimCirJS -->
+	<link rel="stylesheet" type="text/css" href="vendor/css/simcir.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css/simcir-basicset.css">
+	
+	<!-- Generador de Imagen, NO disponible en esta version -->
+	<!-- <script src="simcirimage.js"></script>  -->
+  
+<style>
+	select { width: 70px; }
+	.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+		background-color: #e9ecef;
+		border-color: #dee2e6 #dee2e6 #fff;
+    }
+	.table-container { overflow-x: auto; margin-top: 15px; }
+	
+	/* --- Tabla compacta --- */
+	.compact-table th, 
+	.compact-table td {
+		padding: 0.2rem 0.3rem !important;
+		vertical-align: middle !important;
+	}
+	
+	/* --- Controles más pequeños --- */
+	.compact-table .form-control-sm {
+		padding: 0.1rem 0.25rem;
+		height: 1.4rem;
+		font-size: 0.8rem;
+	}
+  
+  /* --- Columnas tipo Z (ancho fijo, estética compacta) --- */
+	.compact-table th.col-Z,
+	.compact-table td.col-Z {
+		width: 55px;      /* Ajustado: más angosto y estético */
+		min-width: 55px;
+		max-width: 55px;
+		text-align: center;
+	}
+	
+	/* --- Asegura que los selects no expandan la celda --- */
+	.compact-table select.form-control-sm {
+		width: 100%;
+		box-sizing: border-box;
+	}
+	
+	body { background: #fafafa; padding: 20px;}
+	h2 { font-weight: 600; }
+</style>
+
+  
+  
+</head>
+
+<body>
+	<!-- ##################### NAVBAR ##################### -->
+	<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" ng-cloak ng-if="userLogged">
+	  <a class="navbar-brand" style="cursor: pointer;"><img width="50" src="custom/img/logo_blur.png"></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  
+
+
+	
+	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item"><a class="nav-link" title="Ecuación Bool"  style="cursor:pointer;" href="./crearecuacion.html" data-target="#container" ><i class="material-icons">border_color</i></a></li>
+			<li class="nav-item"><a class="nav-link" title="Simular Circuito"  style="cursor:pointer;" href="./index.html" data-target="#container" ><i class="material-icons">memory</i></a></li>
+			
+			<li class="nav-item"><a class="nav-link" title="Ayuda Rapida" data-toggle="modal" data-target="#help-modal" style="cursor:pointer;"><i class="material-icons">help</i></a></li>
+		</ul>		
+	  </div>
+	</nav>
+	
+	
+	<!-- ##################### CONTENEDOR PRINCIPAL ##################### -->
+	<div class="container" style="margin-top: 60px; margin-left: 10px; margin-right: 10px; margin-bottom:10px;">
+	<h2 class="mb-4">Generador de Tabla de Verdad</h2>
+
+	<!-- Controles de variables -->
+	<div class="row mb-3">
+		<div class="col-md-6">
+			<label>Cantidad de Variables:</label>
+			<div class="d-flex align-items-center">
+				<span class="mr-2">Entrada: </span><span id="label_icols" class="mr-2">4</span>
+				<input type="range" id="icols" min="1" max="10" value="4" step="1" class="custom-range" style="width:120px;">
+				<span class="ml-3 mr-2">Salida:</span><span id="label_ocols" class="mr-2">1</span>
+				<input type="range" id="ocols" min="1" max="10" value="1" step="1" class="custom-range" style="width:120px;">
+			</div>
+		</div>
+		<div class="col-md-6 text-right">
+			<input type="button" class="btn btn-dark" id="btnGenerar" value="TABLA" onclick="fx_crear()"/>
+			<input type="button" class="btn btn-secondary" id="btnLimpiar" value="LIMPIAR" onclick="fx_limpiar()"/>
+		</div>
+	</div>
+
+  <!-- Tabla dinámica -->
+  <div class="table-container">
+	<div id="resultado"></div>
+	<div id="variables">Defina la cantidad de Variables de Entrada, Salida y de Click en "TABLA"</div>
+  </div>
+
+
+  <!-- Navs -->
+  <ul class="nav nav-tabs mt-4" id="navTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="minmax-tab" data-toggle="tab" href="#minmax" role="tab">Ecuación Min & Max término</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="quine-tab" data-toggle="tab" href="#quine" role="tab">Quine-McCluskey</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="diagram-tab" data-toggle="tab" href="#diagram" role="tab">Diagrama</a>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="navTabsContent">
+    <!-- Tab 1 -->
+    <div class="tab-pane fade show active p-3" id="minmax" role="tabpanel">
+      <h5>SOP y POS <input type="button" class="btn btn-dark" id="btnGenerar" value="ECUACION" onclick="get_sop()"/></h5>
+		<table border="0" class="table">
+			<tr class="table-row-group">
+				<th>SOP</th>
+				<th>&nbsp;</th>
+				<th>POS</th>
+			</tr>
+			<tr>
+				<td><div id="sop" ></div></td>
+				<td>&nbsp;</td>
+				<td><div id="pos" ></div></td>
+			</tr>
+		</table>
+	  
+    </div>
+
+    <!-- Tab 2 -->
+    <div class="tab-pane fade p-3" id="quine" role="tabpanel">
+		<select id="seleccion_var" name="seleccion_var"  >  <!-- onchange='f_obtener_valores(this.id)' -->
+		</select>
+      <button class="btn btn-dark mb-3" onclick="my_qm()">MINIMIZAR</button>
+		<div class="container">
+			<div class="row" id="solutionterm" ></div>
+			<div class="row" id="solution" >Defina la cantidad de Variables de Entrada, Salida, de Click en "TABLA" y luego Elija la Variable de Salida a MINIMIZAR</div>
+			<div class="row" id="solution2" > </div>
+			<div class="row" id="solution3" > </div>
+			<div class="col text-center solution-container" id="solution4" > </div>
+		</div>
+	  
+    </div>
+
+    <!-- Tab 3 -->
+    <div class="tab-pane fade p-3" id="diagram" role="tabpanel">
+      <h5>Simulación con SimCirJS</h5>
+      <p>Z = A'B + C</p>
+      <div class="simcir" id="simcir1"></div>
+  	  <!-- <button onclick="simcirimage('simcir1', 'png')" class="btn btn-primary">Exportar a PNG</button>-->
+ 	  <button onclick="simcirimage('simcir1')">Exportar Diagrama</button>	  
+      <p>Z = (A + B)(C + D)</p>
+      <div class="simcir" id="simcir2"></div>
+    </div>
+  </div>
+</div>
+
+
+  
+	<!-- ##################### MODALS ##################### -->
+
+	<div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4>Ayuda</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+			        <p>Instrucciones de uso:</p>
+			        <ul>
+			            <li>Defina el Numero de Variables de Entrada y Salida, arrastrando los <em>Marcadores Horizontales</em></li>
+			            <li>De click en el boton "TABLA", para generar la <em>Tabla de Verdad</em></li>
+			            <li>Por cada variable de Salida, debera definir</li>
+							<ul>
+								<li>1 - Para indicar un implicante</li>
+								<li>X - Para indicar un Don't Care</li>
+							</ul>
+						<li><strong>Limpiar formulario</strong>, puede realizar una nueva generacion, haciendo click en el boton <em>LIMPIAR</em> y definiendo los nuevos valores</li>
+						<li><strong>Ecuación Min & Max termino</strong>, se generan en forma automatica al hacer click en el boton <em>ECUACION</em>, si esta no refleja los ultimos cambios, solo basta con volver a precionar el boton</li>
+						<li><strong>Quine-McCluskey</strong>, Elija la Variable de Salida, a la cual le desea generar la ecuación minimizada y de click en el boton <em>Minimizar</em></li>
+						<li><strong>Diagramas</strong>, es posible solo al tener una Ecuación minimizada</li>
+			        </ul>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-dark" data-dismiss="modal">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<!-- ##################### VENDOR ASSETS ##################### -->
+	<!-- Bootstrap JS -->
+	<!-- JQuery 3.3.1 popper 1.14.7 Bootstrap 4.3.1 -->
+	<script type="text/javascript" src="vendor/js/jquery.min.js"></script>
+	<script type="text/javascript" src="vendor/js/popper.min.js"></script>
+	<script type="text/javascript" src="vendor/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="vendor/js/toastr.min.js"></script>
+	<script type="text/javascript" src="vendor/js/simplecrypto.min.js"></script>
+	<script type="text/javascript" src="vendor/js/tone.min.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-basicset.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-library.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-transmitter.js"></script>
+	<script type="text/javascript" src="vendor/js/simcir-dso.js"></script>
+	
+	<!-- ##################### CUSTOM ASSETS ##################### -->
+	<script type="text/javascript" src="custom/js/instruments.js"></script>
+	<script type="text/javascript" src="custom/js/instruments2.js"></script>
+	<script type="text/javascript" src="custom/js/simcir-external-port.js"></script>
+	<script type="text/javascript" src="custom/js/simcir-audio-port.js"></script>
+	<script type="text/javascript" src="custom/js/controller.js"></script>
+	
+	<!-- ## Propios de UESimCir ## -->
+	<script src="custom/js/simcir_qm.js"></script>
+	<script src="custom/js/simcir_minmaxtermino.js"></script>
+	<script src="custom/js/simcir_tablaverdad.js"></script>
+
+<!-- SimCirJS Ejemplo -->
+<script>
+  // Ejemplo simple de incrustación SimCirJS
+  var $s = simcir;
+  var $simcir = $('#simcir1');
+  var $myvar = {
+  "width":800,
+  "height":400,
+  "showToolbox":false,
+  "toolbox":[
+    {"type":"In"},
+    {"type":"Out"},
+    {"type":"Joint"},
+    {"type":"DC"},
+    {"type":"LED"},
+    {"type":"PushOff"},
+    {"type":"PushOn"},
+    {"type":"Toggle"},
+    {"type":"BUF"},
+    {"type":"NOT"},
+    {"type":"AND"},
+    {"type":"NAND"},
+    {"type":"OR"},
+    {"type":"NOR"},
+    {"type":"XOR"},
+    {"type":"XNOR"},
+    {"type":"OSC"},
+    {"type":"7seg"},
+    {"type":"16seg"},
+    {"type":"4bit7seg"},
+    {"type":"RotaryEncoder"},
+    {"type":"BusIn"},
+    {"type":"BusOut"},
+    {"type":"RS-FF"},
+    {"type":"JK-FF"},
+    {"type":"T-FF"},
+    {"type":"D-FF"},
+    {"type":"8bitCounter"},
+    {"type":"HalfAdder"},
+    {"type":"FullAdder"},
+    {"type":"4bitAdder"},
+    {"type":"2to4BinaryDecoder"},
+    {"type":"3to8BinaryDecoder"},
+    {"type":"4to16BinaryDecoder"}
+  ],
+  "devices":[
+    {"type":"In","id":"dev0","x":56,"y":32,"label":"In"},
+    {"type":"In","id":"dev1","x":48,"y":104,"label":"In"},
+    {"type":"NOT","id":"dev2","x":152,"y":24,"label":"NOT"},
+    {"type":"AND","id":"dev3","x":208,"y":88,"label":"AND"},
+    {"type":"Out","id":"dev4","x":328,"y":104,"label":"Out"}
+  ],
+  "connectors":[
+    {"from":"dev2.in0","to":"dev0.out0"},
+    {"from":"dev3.in0","to":"dev2.out0"},
+    {"from":"dev3.in1","to":"dev1.out0"},
+    {"from":"dev4.in0","to":"dev3.out0"}
+  ]
+};
+  
+  
+  $s.setupSimcir($simcir, $myvar );
+  
+  
+  // simcir.setupSimcir($('#simcir1'));
+
+  $('#simcir2').text(JSON.stringify({
+    "width":600,
+    "height":200,
+    "showToolbox": false,
+    "devices":[
+      {"type":"In","label":"A","x":32,"y":48,"id":"a"},
+      {"type":"In","label":"B","x":32,"y":112,"id":"b"},
+      {"type":"OR","x":128,"y":80,"id":"or1"},
+      {"type":"In","label":"C","x":32,"y":176,"id":"c"},
+      {"type":"In","label":"D","x":32,"y":240,"id":"d"},
+      {"type":"OR","x":128,"y":208,"id":"or2"},
+      {"type":"AND","x":256,"y":144,"id":"and1"},
+      {"type":"Out","label":"Z","x":384,"y":144,"id":"z"}
+    ],
+    "connectors":[
+      {"from":"a.out0","to":"or1.in0"},
+      {"from":"b.out0","to":"or1.in1"},
+      {"from":"c.out0","to":"or2.in0"},
+      {"from":"d.out0","to":"or2.in1"},
+      {"from":"or1.out0","to":"and1.in0"},
+      {"from":"or2.out0","to":"and1.in1"},
+      {"from":"and1.out0","to":"z.in0"}
+    ]
+  }));
+  simcir.setupSimcir($('#simcir2'));
+</script>
+<script type="text/javascript" >
+
+if (window.sessionStorage) {}
+else
+{
+	document.getElementById("label_warning").innerHTML="Tu Browser no soporta sessionStorage";
+	throw new Error('Tu Browser no soporta sessionStorage!');
+}
+
+
+function convertToBinary (number, bin) 
+{
+    if (number > 0) 
+	{
+        return convertToBinary( parseInt(number / 2) ) + (number % 2)
+    };
+    return '';
+}
+
+
+function fx_limpiar() 
+{
+	document.getElementById("resultado").innerHTML="";
+}
+
+
+const label_value1 = document.querySelector("#label_icols");
+const input1 = document.querySelector("#icols");
+label_value1.textContent = input1.value;
+input1.addEventListener("input", (event) => {
+  label_value1.textContent = event.target.value;
+});
+
+const label_value2 = document.querySelector("#label_ocols");
+const input2 = document.querySelector("#ocols");
+label_value2.textContent = input2.value;
+input2.addEventListener("input", (event) => {
+  label_value2.textContent = event.target.value;
+});
+
+
+</script>
+
+
+
+</body>
+</html>
