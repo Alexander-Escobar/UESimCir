@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Manual de Usuario - UESimCir</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    :root{
+      --bg-light:#ffffff;
+      --text-light:#222;
+      --muted-light:#6c757d;
+      --card-light:#f8f9fa;
+      --bg-dark:#121212;
+      --text-dark:#e9ecef;
+      --muted-dark:#bdbdbd;
+      --card-dark:#1f1f1f;
+    }
+	
+	/* Compactar índice lateral */
+	#sidebar .list-group-item 
+	{
+		padding-top: 0.25rem;
+		padding-bottom: 0.25rem;
+		line-height: 1.2;
+	}
+	#sidebar h5 { margin-bottom: 0.5rem; }
+	
+    /* Base */
+    html{scroll-behavior:smooth}
+    body{background:var(--bg-light);color:var(--text-light);margin:0;padding-top:64px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+    /* Top navbar */
+    .topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;border-bottom:1px solid #e9ecef;display:flex;align-items:center;justify-content:center;z-index:1120}
+    .topbar .title{font-weight:600}
+    .topbar .controls{position:absolute;right:16px;display:flex;align-items:center;gap:8px}
+    /* Menu toggle */
+    #menuToggle{position:absolute;left:12px;top:12px;z-index:1130;background:#007bff;color:#fff;border:0;border-radius:6px;width:40px;height:40px}
+    #menuToggle:focus{outline:none}
+    /* Logo */
+    .topbar img.logo{height:40px;width:auto}
+    /* Sidebar */
+    #sidebar{position:fixed;top:64px;left:0;width:250px;height:calc(100% - 64px);background:var(--card-light);border-right:1px solid #e6e6e6;overflow:auto;padding-bottom:40px;z-index:1100}
+    #sidebar.hidden{transform:translateX(-260px)}
+    /* Content */
+    #content{margin-left:270px;padding:22px}
+    @media (max-width:991.98px){#content{margin-left:20px;padding:18px}} 
+    @media (max-width:767.98px){#sidebar{left:0;transform:none;position:relative;width:100%;height:auto}#sidebar.hidden{display:none}#content{margin-left:0;padding-top:12px}}
+    /* Highlight */
+    .highlight{background:yellow;color:inherit;padding:0}
+    /* Back to top */
+    #backToTop{position:fixed;right:20px;bottom:20px;width:48px;height:48px;border-radius:50%;background:#007bff;color:#fff;border:0;font-size:20px;z-index:1150}
+    /* KBD style (Bootstrap provides, but ensure contrast) */
+    kbd{background-color:#212529;color:#fff;padding:.2rem .4rem;border-radius:.25rem;border:1px solid rgba(0,0,0,.2);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
+
+    /* Dark mode */
+    body.dark-mode{background:var(--bg-dark);color:var(--text-dark)}
+    body.dark-mode .topbar{background:#0f1720;border-bottom-color:#2b2b2b}
+    body.dark-mode #sidebar{background:var(--card-dark);border-right-color:#2b2b2b}
+    body.dark-mode .card{background:#161616;border-color:#2b2b2b}
+    body.dark-mode .list-group-item{background:transparent;color:var(--text-dark);border-color:transparent}
+    body.dark-mode .highlight{background:orange;color:#111}
+    body.dark-mode kbd{background-color:#e9ecef;color:#111}
+	body.dark-mode a[rel="license"] img {
+		filter: brightness(0.8);
+	}
+	
+    /* --- Corrección: visibilidad de tablas en modo oscuro --- */
+    body.dark-mode table {
+      background-color: #1e1e1e !important;
+      color: #e9ecef !important;
+      border-color: #333 !important;
+    }
+    body.dark-mode table th,
+    body.dark-mode table td {
+      border-color: #333 !important;
+    }
+    body.dark-mode thead.thead-light th {
+      background-color: #2b2b2b !important;
+      color: #f1f1f1 !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="topbar shadow-sm">
+    <button id="menuToggle" aria-label="Mostrar u ocultar menú">☰</button>
+    <div class="title"><a class="navbar-brand font-weight-bold" href="#">UESimCir</a>
+	</div>
+	<span class="navbar-text">Manual de Usuario — UES Simulador de Circuitos Digitales</span>
+	
+    <div class="controls">
+      <button id="themeToggle" class="btn btn-sm btn-light" title="Cambiar modo" aria-label="Cambiar modo">🌙</button>
+      <img src="image/logo.png" id="headerLogo" alt="UESimCir logo" class="logo"/>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="shadow-sm hidden" role="navigation" aria-label="Índice del manual">
+    <div class="p-3 border-bottom">
+      <h5 class="mb-2">Índice</h5>
+      <input id="searchInput" class="form-control" placeholder="Buscar en el manual..." aria-label="Buscar en el manual">
+    </div>
+
+	<div class="list-group list-group-flush">
+		<a class="list-group-item list-group-item-action" href="#intro">Introducción</a>
+		<a class="list-group-item list-group-item-action" href="#funciones">Funciones Principales</a>
+		<a class="list-group-item list-group-item-action" href="#requisitos">Requisitos</a>
+		<a class="list-group-item list-group-item-action" href="#instalacion">Instalación</a>
+		<a class="list-group-item list-group-item-action" href="#interfaz">Interfaz Principal</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#SimuladorCircuitos">* Simulador de Circuito</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#EditorEcuacion">* Editor de ecuaciones</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#TablaVerdad">* Tabla de Verdad</a>
+		
+		<a class="list-group-item list-group-item-action" href="#atajos">Atajos de teclado y controles</a>
+		
+		<a class="list-group-item list-group-item-action" href="#ComoHacer">Como hacer</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#CrearModeloCircuito">* Cómo crear un Modelo de Circuito</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#CrearEditorEcuacion">* Cómo trabajar con el Editor de Ecuaciones</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#CrearTablaVerdad">* Cómo trabajar con el Generador a partir de la Tabla de Verdad</a>
+		
+		<a class="list-group-item list-group-item-action" href="#faq">FAQ</a>
+		
+		<a class="list-group-item list-group-item-action" href="#creditos">Créditos</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#autores">* Autores</a>
+		
+		<a class="list-group-item list-group-item-action" href="#licencia">Licencia de UESimCir</a>
+		<a class="list-group-item list-group-item-action pl-4 small text-muted" href="#dependencias">* Dependencias</a>
+	</div>
+  </aside>
+
+  <!-- Main content -->
+  <main id="content">
+    <section id="intro" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Introducción</h2>
+        <p>UESimCir es una herramienta didáctica diseñada para la asignatura <em>Sistemas Digitales</em> de la Universidad de El Salvador. Permite diagramar y simular circuitos digitales, generar tablas de verdad y ecuaciones booleanas a partir de la representación que el usuario ingrese.</p>
+      </div></div>
+    </section>
+	
+    <section id="funciones" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Funciones principales</h2>
+        <ul>
+          <li>Creación y Modelado de circuitos.</li>
+		  <li>Poder trabajar con tablas de verdad</li>
+		  <li>Implementar ecuaciones de bool</li>
+          <li>Convertir entre ecuación booleana, tabla y circuito automáticamente.</li>
+          <li>Guardar y cargar proyectos.</li>
+        </ul>
+      </div></div>
+    </section>
+
+    <section id="requisitos" class="mb-4">
+      <div class="card">
+	  <div class="card-body">
+        <h2>Requisitos del sistema</h2>
+
+	  <ul class="list-group">
+		<li class="list-group-item">Sistema operativo: Windows 7+ o Linux (distribuciones basadas en Debian o Ubuntu)</li>
+		<li class="list-group-item">Arquitectura: 32 bits</li>
+		<li class="list-group-item">Procesador: Intel o AMD 1.6 GHz o superior</li>
+		<li class="list-group-item">Memoria RAM: 2 GB (4 GB recomendado para circuitos grandes)</li>
+		<li class="list-group-item">Espacio en disco: <strong>menor a 300 MB</strong> de instalación</li>
+		<li class="list-group-item">Resolución recomendada: 1024 × 700 px o superior</li>
+	  </ul>
+
+	  <p class="small text-muted mt-2">
+		Los valores indicados corresponden a la versión actual de UESimCir. 
+		El tamaño en disco puede variar ligeramente según el sistema operativo y los módulos adicionales instalados.
+	  </p>
+		
+      </div>
+	  </div>
+    </section>
+
+    <section id="instalacion" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Instalación</h2>
+        <p>Descargue el paquete para su sistema desde el repositorio o la página del software. El archivo es sisdig.exe en Windows; es un software portable. La aplicación está empaquetada con Electron JS.</p>
+		Sitio Oficial, del repositorio https://github.com/Alexander-Escobar/UESimCir
+      </div></div>
+    </section>
+
+
+    <section id="interfaz" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Interfaz principal</h2>
+		<p>El aplicativo, se compone de 3 Paneles o Interfaces, El Simulador de Circuitos con el que podra realizar Diagramas, el Generador a partir de la Tabla de Verdad y el Editor de Ecuaciones de Bool o Expresiones de Bool. A partir de cada inferfaz usted puede generar los demas elementos.</p>
+		<div class="text-center my-3">
+		<img src="image/captura-interfas-trilogia.png" alt="Interfaz UESimCir" class="img-fluid rounded mx-auto d-block">
+		</div>
+		
+		<!-- Simulador de Circuitos -->
+		<div class="d-flex align-items-center mt-4">
+		  <img src="image/captura-ico-simcir.png" alt="Simulador de Circuitos" width="56" height="56" class="mr-3">
+		  <h3 class="h5 mb-0" id="SimuladorCircuitos">Simulador de Circuitos</h3>
+		</div>
+		<p>Te Permitirá crear, modificar y analizar circuitos digitales mediante una interfaz visual basada en componentes lógicos. Por defecto, la primera Interfaz es el Simulador de Circuitos, esta te permitirá representar un circuito, mediante compuerlas lógicas básicas, a partir de alli, puedes generar la tabla de verdad y las Ecuaciones de Bool.</p>		
+        <p><strong>La interfaz incluye:</strong> barra de menu, barra de herramientas, barra lateral de componentes, zona de diseño (lienzo).</p>
+        <img src="image/captura-principal-partes.png" alt="Interfaz UESimCir" class="img-fluid rounded border mt-2">
+		
+        <table class="table table-bordered">
+          <thead class="thead-light"><tr><th>Componente de interfaz</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td>1 - Barra de Menu</td><td><img src="image/captura-principal-menu.png" alt="Barra de Menu" class="img-fluid rounded border mt-2"></td></tr>
+			<tr><td>2 - Barra de Herramienta</td><td><img src="image/captura-principal-herramienta.png" alt="Barra de Herramienta" class="img-fluid rounded border mt-2"></td></tr>
+            <tr><td>3 - Barra lateral de componentes</td><td><img src="image/captura-principal-componente.png" alt="Barra de Lateral de componentes" class="img-fluid rounded border mt-2"></td></tr>
+            <tr><td>4 - Zona de Diseño (lienzo)</td><td><img src="image/captura-principal-lienso.png" alt="Zona de Diseño" class="img-fluid rounded border mt-2"></td></tr>
+          </tbody>
+        </table>
+
+		<!-- Editor de ecuaciones -->
+		<div class="d-flex align-items-center mt-4">
+		  <img src="image/captura-ico-ecuacion.png" alt="Editor de ecuaciones" width="56" height="56" class="mr-3">
+		  <h3 class="h5 mb-0" id="EditorEcuacion">Editor de ecuaciones</h3>
+		</div>
+
+		<!-- Tabla de Verdad -->
+		<div class="d-flex align-items-center mt-4">
+		  <img src="image/captura-ico-tabla.png" alt="Tabla de Verdad" width="56" height="56" class="mr-3">
+		  <h3 class="h5 mb-0" id="TablaVerdad">Tabla de Verdad</h3>
+		</div>
+		
+      </div></div>
+    </section>
+
+    <section id="atajos" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Atajos de teclado y controles</h2>
+        <p>Atajos generales disponibles:</p>
+        <table class="table table-bordered">
+          <thead class="thead-light"><tr><th>Acción</th><th>Atajo</th></tr></thead>
+          <tbody>
+			<tr><td>Recargar la aplicación</td><td><kbd>Ctrl</kbd> + <kbd>R</kbd></td></tr>
+			<tr><td>Pantalla Completa</td><td><kbd>F11</kbd></td></tr>
+			
+			<tr><td>Minimizar</td><td><kbd>Ctrl</kbd> + <kbd>M</kbd></td></tr>
+			
+			<tr><td>Debuger *</td><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>I</kbd> / <kbd>Alt</kbd> + <kbd>Command</kbd> + <kbd>I</kbd> (macOS)   </td></tr>
+			<tr><td>Manual de Usuario</td><td><kbd>F1</kbd> </td></tr>
+            <tr><td>Salir de la aplicación</td><td><kbd>Ctrl</kbd> + <kbd>W</kbd> / <kbd>Alt</kbd> + <kbd>F4</kbd> / <kbd>Ctrl</kbd> + <kbd>W</kbd></td></tr>
+          </tbody>
+        </table>
+		
+	    <p class="mt-3 small text-muted">* Debuger, es una caracteristica avanzada, y requiere ser habilitada para trabajar con el.</p>
+      </div></div>
+    </section>
+
+	
+    <section id="ComoHacer" class="mb-4">
+      <div class="card"><div class="card-body">
+      <!-- 🔹 Nueva subsección añadida -->
+      
+		<h2>Cómo hacer</h2>
+	<div class="mt-4">
+        <h3 class="h5" id="CrearModeloCircuito">Cómo crear un Modelo de Circuito</h3>
+        <p>
+          Para crear un nuevo modelo de circuito en <strong>UESimCir</strong>, desde la interfaz de Simulador de Circuitos:
+        </p>
+        <ol>
+          <li>Elija un dispositivo de la lista <em>Barra lateral de componente (Barra Vertical)</em> y arrastre hacia la derecha, soltando los componentes en el área de trabajo</li>
+		  <li>Puede moverlos o distribuirlos por el lienso con solo arrastraslos</li>
+          <li><strong>Conecte entradas con salidas</strong> arrastrando, según la lógica deseada. <em>Circulo naranja/amarrilo es una entrada y Circulo blanco es salida</em></li>
+        </ol>
+		<p>
+		 <ul>
+          <li><strong>Borrar un componente</strong>, solo arrastrelo de vuelta a la <em>Barra lateral de componente (Barra Vertical)</em></li>
+		  <li><strong>Para desconectar un nodo</strong>, o componente, solo basta con hacer click en el circulo pequeño de Entrada <em>Circulo naranja/amarrilo</em> del dispositivo</li>
+		  <li><strong>Asigna nombres</strong>, a las señales o nodos si lo deseas, Doble click en una etiqueta para renombrar los dispositivos y luego Enter para confirmar</li>
+		  <li><strong>Ver componente de Mediana escala</strong>, Doble click en un componente de mediana escala para abrir el circuito y visualizar lo que contiene.</li>
+		  <li><strong>Guarda el modelo mediante</strong> la funcion <em>Exportar a Archivo</em> para conservar tu diseño.</li>
+		  <li><strong>Tabla de Verdad y Ecuaciones</strong>, son visible utilizando el icono <em>Obtener funciones</em>, pero debe utilizar los componentes "Test-In" y "Test-Out" para obtener la tabla de verdad del circuito combinacional</li>
+		 </ul>
+        </p>
+        <!-- <img src="image/crear-modelo.png" alt="Ejemplo de creación de modelo de circuito" class="img-fluid rounded mx-auto d-block mt-3" style="max-width: 600px;"> -->
+	</div >
+	<div class="mt-4">
+		<h3 class="h5" id="CrearEditorEcuacion">Cómo trabajar con el Editor de Ecuaciones</h3>
+        <p>
+          Para trabajar con Expresiones de Bool, desde el <em>Editor de Ecuaciones</em> debe tener las siguientes recomendaciones:
+        </p>
+        <ul>
+          <li><em>Variable de Salida</em>, va en la primera casilla</li>
+		  <li><em>Variable de Entrada</em>, son detectadas en la ecuación y estas deben ser LETRAS exclusivamente, se recomienda el uso de Mayusculas</li>
+		  <li><em>Caracteres Validos</em></li>
+		  <ul>
+			<li>son Letras excluyendo la [Ñ] para definir <em>variables de Entrada</em></li>
+			<li>signo mas [+], para compuertas OR</li>
+			<li>signo asterisco [*], para compuertas AND, esta puede ser omitida entre parentesis o entre Variables de Entrada (Ej: ABC, (AB)(AC))</li>
+			<li>apostrofe para denegar ['] y debe ir al final de la variable (Ej: B')</li>
+			<li>los parentesis [ ( ) ] para indicar anidamiento, procure no ingresar mas de 3 niveles</li>
+		  </ul>
+        </ul>
+        <!-- <img src="image/crear-modelo.png" alt="Ejemplo de creación de modelo de circuito" class="img-fluid rounded mx-auto d-block mt-3" style="max-width: 600px;"> -->
+		
+	</div >
+	<div class="mt-4">
+        <h3 class="h5" id="CrearTablaVerdad">Cómo trabajar con el Generador a partir de la Tabla de Verdad</h3>
+        <p>
+          Para trabajar con el Generador a partir de la Tabla de Verdad, desde la <em>interfaz de Tabla de Verdad</em>:
+        </p>
+        <ol>
+          <li>Defina el Numero de Variables de Entrada, arrastrando el <em>Marcador de Entrada</em></li>
+		  <li>Defina el Numero de Variables de Salida, arrastrando el <em>Marcador de Salida</em></li>
+		  <li>Precione el boton de <em>Crear Tabla</em></li>
+		  <li>Por cada variable de Salida, debera indicar</li>
+		  <ul>
+			<li>1 - Para indicar un implicante</li>
+			<li>X - Para indicar un Don't Care</li>
+		  </ul>
+        </ol>
+		<p>
+		 <ul>
+          <li><strong>Limpiar formulario</strong>, puede realizar una nueva generacion, haciendo click en el boton <em>Limpiar</em> y definiendo los nuevos valores</li>
+		  <li><strong>Ecuación Min & Max termino</strong>, se generan en forma automatica al hacer click en el boton <em>ECUACION</em>, si esta no refleja los ultimos cambios, solo basta con volver a precionar el boton</li>
+		  <li><strong>Quine-McCluskey</strong>, Elija la Variable de Salida, a la cual le desea generar la ecuación minimizada y de click en el boton <em>Minimizar</em></li>
+		  <li><strong>Modelo de Circuito</strong>, es posible solo al tener una Ecuación minimizada</li>
+		</ul>
+        </p>
+        <!-- <img src="image/crear-modelo.png" alt="Ejemplo de creación de modelo de circuito" class="img-fluid rounded mx-auto d-block mt-3" style="max-width: 600px;"> -->
+		
+      </div>
+      <!-- 🔹 Fin de la nueva subsección -->
+      </div></div>
+    </section>
+
+
+    <!-- <section id="ejemplo" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Documentación Técnica</h2>
+        <p>Existe documentacion que esta disponible para la modificacion de este software</p>
+		[Version 01.02 Instalacion]\resources\app\custom\help\
+        <img src="image/Captura_XOR.png" alt="Ejemplo XOR" class="img-fluid rounded border mt-2">
+      </div></div>
+    </section>
+	-->
+
+    <section id="faq" class="mb-4">
+      <div class="card"><div class="card-body">
+        <h2>Preguntas frecuentes</h2>
+        <p><strong>¿Funciona sin Internet?</strong> Sí, la aplicación funciona offline, es una version portable.</p>
+        <p><strong>¿Puedo exportar diagramas?</strong> Sí, desde Archivo → Exportar. Son Extencion .uesimcir / .simcir</p>
+		<p><strong>¿Puedo Generar Imagenes de los Diagramas?</strong> No, todavia no cuenta con esa funcionalidad</p>
+		<p><strong>¿Puedo Generar Mis Propios componentes?</strong> Si, basados en las compuertas basicas o las incluidas en el aplicativo, requiere ver la documentacion tecnica</p>
+      </div></div>
+    </section>
+
+    <section id="creditos" class="mb-4">
+		<div class="card">
+			<div class="card-body">
+				<h2>Créditos</h2>
+				<p class="text-muted small">Versión 1.0 • Licencia: Creative Commons Atribución - No Comercial - Compartir Igual 4.0 Internacional (CC BY-NC-SA 4.0).</p>
+				<p>Desarrollado para la Universidad de El Salvador, para uso didactico en la materia de Sistemas Digitales</p>
+				
+				
+  <h3 class="h5 mt-4" id="autores">Autores</h3>
+  <div class="list-group mb-4">
+    <div class="list-group-item">
+      <h5 class="mb-1">Alexander Enrique Escobar O.</h5>
+      <p class="mb-1">Autor y Desarrollador de <strong>UESimCir</strong>.</p>
+      <p class="small mb-1">
+        <strong>Correo:</strong> <a href="mailto:alexander.enrique.escobar@gmail.com">alexander.enrique.escobar@gmail.com</a><br>
+        <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/alexanderescobar/" target="_blank">linkedin.com/in/alexanderescobar</a>
+      </p>
+    </div>
+
+    <div class="list-group-item">
+      <h5 class="mb-1">Salvador Germán</h5>
+      <p class="mb-1">Autor en definición y lineamientos conceptuales del software.</p>
+      <p class="small mb-1">
+        <strong>Correo:</strong> <a href="mailto:Salvador.German@gmail.com">Salvador.German@gmail.com</a>
+      </p>
+    </div>
+  </div>
+				
+				
+			</div>
+		</div>
+	</section>
+
+<section id="licencia" class="mt-4">
+	<div class="card">
+	<div class="card-body">
+  <h2 class="h2">Licencia de UESimCir</h2>
+  <p>El software <strong>UESimCir</strong> se distribuye bajo la licencia 
+
+  
+  <div class="mt-3 text-center">
+
+  <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+    <img alt="Licencia Creative Commons" style="border-width:0"
+      src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" />
+  </a>
+  <p class="small text-muted mb-0">
+    <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+      CC BY-NC-SA 4.0 Internacional
+    </a>
+  </p>
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+  <p class="text-muted small">Creative Commons Atribución - No Comercial - Compartir Igual 4.0 Internacional (CC BY-NC-SA 4.0).</p></a></p>
+  <p class="small text-muted mt-3">
+    © 2025 [Alexander Enrique Escobar O.]. Todos los derechos reservados.
+  </p>
+  </div>
+
+  <p>Esto significa que usted puede usar, estudiar, modificar y compartir el software libremente, siempre que:</p>
+
+  <ul>
+    <li>Otorgue el crédito correspondiente al autor original.</li>
+    <li>No utilice el software ni sus derivados con fines comerciales.</li>
+    <li>Distribuya las versiones modificadas bajo la misma licencia.</li>
+  </ul>
+  
+  <h3 class="h5 mt-4" id="dependencias">Dependencias</h3>
+  <p>El software incluye las siguientes dependencias de terceros, todas distribuidas bajo licencias permisivas de código abierto:</p>
+
+  <div class="list-group">
+    <div class="list-group-item" hidden>
+      <h5 class="mb-1">SimCirJS</h5>
+      <p class="mb-1">Autor: Kazuhiko Arase</p>
+      <p class="mb-1">Licencia: <strong>MIT License</strong></p>
+      <a href="https://github.com/kazuhikoarase/simcirjs" target="_blank">https://github.com/kazuhikoarase/simcirjs</a>
+      <p class="small text-muted mb-0">© 2013 Kazuhiko Arase</p>
+    </div>
+
+    <div class="list-group-item">
+      <h5 class="mb-1">Bootstrap 4.3.1</h5>
+      <p class="mb-1">Autores: Mark Otto, Jacob Thornton y colaboradores del proyecto Bootstrap</p>
+      <p class="mb-1">Licencia: <strong>MIT License</strong></p>
+      <a href="https://getbootstrap.com/" target="_blank">https://getbootstrap.com/</a>
+      <p class="small text-muted mb-0">© 2011-2025 The Bootstrap Authors</p>
+    </div>
+
+    <div class="list-group-item">
+      <h5 class="mb-1">jQuery 3.3.1</h5>
+      <p class="mb-1">Autor: The jQuery Foundation y contribuyentes</p>
+      <p class="mb-1">Licencia: <strong>MIT License</strong></p>
+      <a href="https://jquery.com/" target="_blank">https://jquery.com/</a>
+      <p class="small text-muted mb-0">© 2006-2025 The jQuery Foundation</p>
+    </div>
+
+    <div class="list-group-item">
+      <h5 class="mb-1">ElectronJS</h5>
+      <p class="mb-1">Autores: GitHub, Inc. y colaboradores del proyecto Electron</p>
+      <p class="mb-1">Licencia: <strong>MIT License</strong></p>
+      <a href="https://www.electronjs.org/" target="_blank">https://www.electronjs.org/</a>
+      <p class="small text-muted mb-0">© 2013-2025 GitHub Inc.</p>
+    </div>
+  </div>
+  <p class="mt-3 small text-muted">
+    Todos los derechos y marcas registradas pertenecen a sus respectivos propietarios.
+  </p>
+  </div>
+  </div>
+</section>
+	
+  </main>
+
+  <!-- Back to top -->
+  <button id="backToTop" title="Volver arriba">↑</button>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    // Elements
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const searchInput = document.getElementById('searchInput');
+    const backToTop = document.getElementById('backToTop');
+    const themeToggle = document.getElementById('themeToggle');
+    const headerLogo = document.getElementById('headerLogo');
+
+    // Menu toggle (manual only)
+	menuToggle.addEventListener('click', () => {
+	sidebar.classList.toggle('hidden');
+	const content = document.getElementById('content');
+	if (sidebar.classList.contains('hidden')) {
+		content.style.marginLeft = '20px';
+	} else {
+		content.style.marginLeft = '270px';
+	}
+	});
+
+
+    // Back to top
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) backToTop.style.display = 'block'; else backToTop.style.display = 'none';
+    });
+    backToTop.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
+
+    // Search & highlight all occurrences
+    // Search & highlight all occurrences (versión corregida y estable)
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function removeHighlights(container) {
+      const highlights = container.querySelectorAll('span.highlight');
+      highlights.forEach(span => {
+        const textNode = document.createTextNode(span.textContent);
+        span.parentNode.replaceChild(textNode, span);
+      });
+      container.normalize();
+    }
+
+    function highlightMatches(term) {
+      const content = document.getElementById('content');
+      removeHighlights(content);
+      if (!term) return;
+
+      // Buscar solo en estos elementos
+      const targets = content.querySelectorAll('p, li, td, h2, h3');
+      targets.forEach(node => {
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+        textNodes.forEach(textNode => {
+          const parent = textNode.parentNode;
+          if (['KBD', 'CODE', 'BUTTON', 'INPUT', 'TEXTAREA'].includes(parent.nodeName)) return;
+
+          const text = textNode.nodeValue;
+          const regex = new RegExp(escapeRegExp(term), 'gi');
+          let lastIndex = 0;
+          let match;
+          const fragment = document.createDocumentFragment();
+
+          while ((match = regex.exec(text)) !== null) {
+            const before = text.slice(lastIndex, match.index);
+            if (before) fragment.appendChild(document.createTextNode(before));
+
+            const mark = document.createElement('span');
+            mark.className = 'highlight';
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+
+            lastIndex = match.index + match[0].length;
+          }
+
+          const after = text.slice(lastIndex);
+          if (after) fragment.appendChild(document.createTextNode(after));
+
+          if (fragment.childNodes.length) {
+            parent.replaceChild(fragment, textNode);
+          }
+        });
+      });
+    }
+
+    // Control de entrada con retardo (para rendimiento)
+    let searchTimer = null;
+    searchInput.addEventListener('input', function () {
+      clearTimeout(searchTimer);
+      const term = this.value.trim();
+      searchTimer = setTimeout(() => highlightMatches(term), 150);
+    });
+
+
+    // Theme toggle (manual only) - default light
+    function setDarkMode(on){
+      if (on){
+        document.body.classList.add('dark-mode');
+        themeToggle.textContent = '☀️';
+        headerLogo.src = 'image/logo_inv.png';
+        localStorage.setItem('uesimcir_theme','dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        themeToggle.textContent = '🌙';
+        headerLogo.src = 'image/logo.png';
+        localStorage.setItem('uesimcir_theme','light');
+      }
+    }
+    // initialize theme from storage (default light)
+    const savedTheme = localStorage.getItem('uesimcir_theme') || 'light';
+    setDarkMode(savedTheme==='dark');
+    themeToggle.addEventListener('click', () => setDarkMode(!document.body.classList.contains('dark-mode')));
+
+    // Ensure sidebar state persists during session? (optional) - keep manual only, no auto-close
+
+    // Accessibility: focus management for menu toggle
+    menuToggle.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); menuToggle.click(); } });
+
+  </script>
+</body>
+</html>
