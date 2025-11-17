@@ -12,9 +12,10 @@ Permite **diagramar y simular circuitos digitales**, **generar tablas de verdad*
 
 
 ### Instalación
-Descargue el paquete para su sistema desde el repositorio o la página del software. El archivo es UESimCir.exe en Windows; es un software portable. La aplicación está empaquetada con Electron JS.
+Descargue el paquete para su sistema desde el repositorio o la página del software. El archivo es **UESimCir.exe** en Windows; es un software portable. La aplicación está empaquetada con Electron JS.
 
 Sitio Oficial, del repositorio https://github.com/Alexander-Escobar/UESimCir
+En la carpeta "Dist" aparecen las diferentes distribuciones por OS
 
 
 ## License / Licencia
